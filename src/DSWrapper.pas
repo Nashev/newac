@@ -755,14 +755,14 @@ function DSW_QueryInputFilled(var dsw : DSoundWrapper; var bytesFilled : long) :
 var
   capturePos : DWORD;
   readPos : DWORD;
-  filled : long;
+  filled : LongInt;
 begin
     // Query to see how much data is in buffer.
     // We don't need the capture position but sometimes DirectSound doesn't handle NULLS correctly
     // so let's pass a pointer just to be safe.
   Result := dsw.dsw_InputBuffer.GetCurrentPosition(@capturePos, @readPos);
   if Result <> DS_OK  then Exit;
-  filled := readPos - dsw.dsw_ReadOffset;
+  filled := LongInt(readPos) - LongInt(dsw.dsw_ReadOffset);
   if filled < 0  then
      Inc(filled, dsw.dsw_InputSize); // unwrap offset
   bytesFilled := filled;

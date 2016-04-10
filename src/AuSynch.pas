@@ -34,6 +34,8 @@ type
    FID : THandle;
    FTimeStart : LongWord;
    function GetTimeElapsed : LongWord;
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const Value: Boolean);
  public
    constructor Create(AOwner: TComponent); override;
    destructor Destroy; override;
@@ -56,6 +58,9 @@ type
    (* Property: FireOnce
       This property determines if the <OnTimer> event should occur once or regularly.  *)
    property FireOnce : Boolean read FFireOnce write FFireOnce;
+   (* Property: Enabled
+      This property determines OnTimet to be called. Set it to True calls Start, set it to False calls Kill. If FireOnce set to true, Kill will be  *)
+   property Enabled: Boolean read GetEnabled write SetEnabled default False;
    (* Property: OnTimer
       This event is fired when the <Interval> has passed. *)
    property OnTimer : THiResTimerEvent read FTimerEvent write FTimerEvent;
@@ -141,7 +146,15 @@ function timeKillEvent(uTimerID : UINT) : MMResult; stdcall; external 'winmm.dll
    inherited;
  end;
 
- procedure TAudioHiResTimer.Start;
+ procedure TAudioHiResTimer.SetEnabled(const Value: Boolean);
+ begin
+   if Value then
+    Start
+   else
+    Kill;
+ end;
+
+procedure TAudioHiResTimer.Start;
  var
    Flags : LongWord;
  begin
@@ -161,7 +174,12 @@ function timeKillEvent(uTimerID : UINT) : MMResult; stdcall; external 'winmm.dll
    FID := 0;
  end;
 
- function TAudioHiResTimer.GetTimeElapsed : LongWord;
+ function TAudioHiResTimer.GetEnabled: Boolean;
+begin
+  Result := FID <> 0;
+end;
+
+function TAudioHiResTimer.GetTimeElapsed : LongWord;
  begin
    Result := timeGetTime - FTimeStart;
  end;
